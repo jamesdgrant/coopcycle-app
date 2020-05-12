@@ -23,7 +23,7 @@ import DangerAlert from '../../components/DangerAlert'
 import { formatPrice } from '../../utils/formatting'
 import i18n from '../../i18n'
 import { incrementItem, decrementItem, removeItem, validate, showAddressModal, hideAddressModal, updateCart } from '../../redux/Checkout/actions'
-import { selectDeliveryTotal, selectShippingDate, selectIsShippingAsap } from '../../redux/Checkout/selectors'
+import { selectDeliveryTotal, selectShippingDate, selectIsShippingAsap, selectCartFulfillmentMethod } from '../../redux/Checkout/selectors'
 import { selectIsAuthenticated } from '../../redux/App/selectors'
 import CartFooter from './components/CartFooter'
 import AddressModal from './components/AddressModal'
@@ -250,6 +250,7 @@ class Summary extends Component {
             <Text style={{ flex: 2, fontSize: 14 }}>{ this.props.timeAsText }</Text>
             <Text note style={{ flex: 1, textAlign: 'right' }}>{ this.props.t('EDIT') }</Text>
           </TouchableOpacity>
+          { this.props.fulfillmentMethod === 'delivery' && (
           <TouchableOpacity style={ [ styles.dateBtn, { flexShrink: 1 } ] }
             // Disable interaction while loading
             onPress={ () => !this.props.isLoading && this.props.showAddressModal() }>
@@ -257,6 +258,7 @@ class Summary extends Component {
             <Text numberOfLines={ 2 } ellipsizeMode="tail" style={{ flex: 2, fontSize: 14 }}>{ this.props.cart.shippingAddress.streetAddress }</Text>
             <Text note style={{ flex: 1, textAlign: 'right' }}>{ this.props.t('EDIT') }</Text>
           </TouchableOpacity>
+          )}
           <TouchableOpacity style={ [ styles.dateBtn, { flexShrink: 1 } ] }
             // Disable interaction while loading
             onPress={ () => !this.props.isLoading && this.setState({ isCouponModalVisible: true }) }>
@@ -361,6 +363,7 @@ function mapStateToProps(state, ownProps) {
     isLoading: state.checkout.isLoading,
     isValid: state.checkout.isValid,
     alertMessage: _.first(state.checkout.violations.map(v => v.message)),
+    fulfillmentMethod: selectCartFulfillmentMethod(state),
   }
 }
 
