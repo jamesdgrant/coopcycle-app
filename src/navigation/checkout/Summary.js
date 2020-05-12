@@ -247,7 +247,7 @@ class Summary extends Component {
             // Disable interaction while loading
             onPress={ () => !this.props.isLoading && this._navigate('CheckoutShippingDate') }>
             <Icon type="FontAwesome" name="clock-o" style={{ fontSize: 22, marginRight: 15 }} />
-            <Text style={{ flex: 2, fontSize: 14 }}>{ this.props.timeAsText }</Text>
+            <Text style={{ flex: 2, fontSize: 14 }}>{ this.props.timeAsText }</Text>
             <Text note style={{ flex: 1, textAlign: 'right' }}>{ this.props.t('EDIT') }</Text>
           </TouchableOpacity>
           { this.props.fulfillmentMethod === 'delivery' && (
@@ -276,7 +276,9 @@ class Summary extends Component {
         </View>
         <View style={{ flex: 0, backgroundColor: '#e4022d' }}>
           <BottomLine label={ this.props.t('TOTAL_ITEMS') } value={ cart.itemsTotal } />
+          { this.props.fulfillmentMethod === 'delivery' && (
           <BottomLine label={ this.props.t('TOTAL_DELIVERY') } value={ this.props.deliveryTotal } />
+          )}
           { deliveryPromotions.map((promotion, index) => (
             <BottomLine key={ `delivery_promotion_${index}` }
               label={ promotion.label } value={ promotion.amount } />
