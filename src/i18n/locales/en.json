@@ -218,6 +218,7 @@
         "CHECKOUT_MORE_INFOS_DISCLAIMER": "Just one last step",
         "CHECKOUT_PICK_DATE": "Choose a date",
         "CHECKOUT_PRODUCT_OPTIONS_CHOICES_BETWEEN": "Between {{min}} and {{max}} choices",
+        "CHECKOUT_FULFILLMENT_CHOICE_COLLECTION": "I will to collect the order myself",
         "ADD_TO_CART": "Add to cart",
         "NOTIFICATION_TASKS_CHANGED_TITLE": "Tasks changed",
         "NOTIFICATION_TASKS_CHANGED_DESC": "Your tasks from {{date}} have been updated",

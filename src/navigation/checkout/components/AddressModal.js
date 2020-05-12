@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ActivityIndicator, Dimensions, PixelRatio, StyleSheet, View, Animated, Keyboard } from 'react-native'
+import { ActivityIndicator, Dimensions, PixelRatio, StyleSheet, View, Animated, Keyboard, SafeAreaView, TouchableOpacity } from 'react-native'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withTranslation } from 'react-i18next'
@@ -10,7 +10,10 @@ import Modal from 'react-native-modal'
 
 import AddressTypeahead from '../../../components/AddressTypeahead'
 
-import { setAddressModalHidden, hideAddressModal, setAddress } from '../../../redux/Checkout/actions'
+import { setAddressModalHidden, hideAddressModal, setAddress, setFulfillmentMethod } from '../../../redux/Checkout/actions'
+import { selectIsDeliveryEnabled, selectIsCollectionEnabled } from '../../../redux/Checkout/selectors'
+
+// const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView)
 
 class AddressModal extends Component {
 
@@ -109,40 +112,51 @@ class AddressModal extends Component {
         swipeDirection={ ['up', 'down'] }
         onModalWillShow={ () => this.props.setAddressModalHidden(false) }
         onModalHide={ () => this.props.setAddressModalHidden(true) }>
-        <Animated.View style={ [ styles.modalContent, { paddingBottom: this.keyboardHeight } ] } testID="addressModal">
-          <View style={{ width, height: 44 + 44 + (44 * 3) }}>
-            <View style={{ height: 44, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={ modalMessageTextStyle }>{ this.props.message }</Text>
-            </View>
-            <View style={{ height: 44 + (44 * 3) }}>
-              <AddressTypeahead
-                country={ this.props.country }
-                googleApiKey={ this.props.googleApiKey }
-                testID="addressModalTypeahead"
-                autoFocus={ true }
-                style={ typeaheadStyles }
-                value={ this.props.address && this.props.address.streetAddress }
-                onPress={ (address) => {
-                  this.props.setAddress(address)
-                  this.setState({ address })
-                }}
-                renderRow={ rowData => {
-                  return (
-                    <Text
-                      testID={ `placeId:${rowData.place_id}` }
-                      style={{ flex: 1, fontWeight: 'bold', fontSize: 14 }}
-                      numberOfLines={ 1 }>
-                      { rowData.description || rowData.formatted_address || rowData.name }
+        <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
+          <Animated.View style={ [ styles.modalContent, { paddingBottom: this.keyboardHeight } ] } testID="addressModal">
+            <View style={{ width, height: 44 + 44 + (44 * 3) }}>
+              <View style={{ height: 44, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={ modalMessageTextStyle }>{ this.props.message }</Text>
+              </View>
+              <View style={{ height: 44 + (44 * 3) }}>
+                <AddressTypeahead
+                  country={ this.props.country }
+                  googleApiKey={ this.props.googleApiKey }
+                  testID="addressModalTypeahead"
+                  autoFocus={ true }
+                  style={ typeaheadStyles }
+                  value={ this.props.address && this.props.address.streetAddress }
+                  onPress={ (address) => {
+                    this.props.setAddress(address)
+                    this.setState({ address })
+                  }}
+                  renderRow={ rowData => {
+
+                    return (
+                      <Text
+                        testID={ `placeId:${rowData.place_id}` }
+                        style={{ flex: 1, fontWeight: 'bold', fontSize: 14 }}
+                        numberOfLines={ 1 }>
+                        { rowData.description || rowData.formatted_address || rowData.name }
+                      </Text>
+                    )
+                  }}
+                  onFocus={ () => this.setState({ shouldShowBackBtn: false }) }
+                  onBlur={ () => this.setState({ shouldShowBackBtn: true }) } />
+                { this.renderBackBtn() }
+                { this.renderLoader() }
+                { this.props.isCollectionEnabled && (
+                  <TouchableOpacity style={{ justifySelf: 'flex-end', backgroundColor: '#dedede', padding: 15 }}
+                    onPress={ () => this.props.setFulfillmentMethod('collection') }>
+                    <Text style={{ textAlign: 'center' }}>
+                      { this.props.t('CHECKOUT_FULFILLMENT_CHOICE_COLLECTION') }
                     </Text>
-                  )
-                }}
-                onFocus={ () => this.setState({ shouldShowBackBtn: false }) }
-                onBlur={ () => this.setState({ shouldShowBackBtn: true }) } />
-              { this.renderBackBtn() }
-              { this.renderLoader() }
+                  </TouchableOpacity>
+                ) }
+              </View>
             </View>
-          </View>
-        </Animated.View>
+          </Animated.View>
+        </SafeAreaView>
       </Modal>
     )
   }
@@ -216,6 +230,7 @@ function mapStateToProps(state, ownProps) {
     isModalVisible: state.checkout.isAddressModalVisible,
     isLoading: state.checkout.isLoading,
     message: state.checkout.isLoading ? ownProps.t('LOADING') : state.checkout.addressModalMessage,
+    isCollectionEnabled: selectIsCollectionEnabled(state),
   }
 }
 
@@ -225,6 +240,7 @@ function mapDispatchToProps(dispatch) {
     setAddress: address => dispatch(setAddress(address)),
     hideAddressModal: () => dispatch(hideAddressModal()),
     setAddressModalHidden: (isHidden) => dispatch(setAddressModalHidden(isHidden)),
+    setFulfillmentMethod: (method) => dispatch(setFulfillmentMethod(method)),
   }
 }
 
