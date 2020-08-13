@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import { AppRegistry } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
+import * as TaskManager from 'expo-task-manager';
 
 import App from './src/App';
 import bgMessaging from './src/notifications/bgMessaging';
@@ -17,5 +18,15 @@ function HeadlessCheck({ isHeadless }) {
 
   return <App />;
 }
+
+TaskManager.defineTask('location-updates', ({ data: { locations }, error }) => {
+
+  if (error) {
+    // check `error.message` for more details.
+    return;
+  }
+
+  console.log('Received new locations', locations);
+})
 
 AppRegistry.registerComponent('CoopCycle', () => App);

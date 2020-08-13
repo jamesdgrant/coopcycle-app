@@ -1,5 +1,6 @@
 import { Alert } from 'react-native'
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation'
+// import BackgroundGeolocation from '@mauron85/react-native-background-geolocation'
+import * as Location from 'expo-location';
 
 import i18n from '../../../i18n'
 import { setBackgroundGeolocationEnabled } from '../../App/actions'
@@ -18,6 +19,9 @@ const BackgroundGeolocationEvents = [
 
 export default ({ getState, dispatch }) => {
 
+  Location.hasServicesEnabledAsync().then(hasServicesEnabledAsync => console.log('Location.hasServicesEnabledAsync()', hasServicesEnabledAsync))
+
+  /*
   const options = {
     desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
     stationaryRadius: 5,
@@ -60,6 +64,15 @@ export default ({ getState, dispatch }) => {
   })
 
   BackgroundGeolocation.configure(options)
+  */
+
+  Location.startLocationUpdatesAsync('location-updates', {
+    accuracy: Location.Accuracy.BestForNavigation,
+    foregroundService: {
+      notificationTitle: i18n.t('BACKGROUND_GEOLOCATION_NOTIFICATION_TITLE'),
+      notificationBody: i18n.t('BACKGROUND_GEOLOCATION_NOTIFICATION_TEXT'),
+    }
+  })
 
   return (next) => (action) => {
 
@@ -67,6 +80,7 @@ export default ({ getState, dispatch }) => {
     const result = next(action)
     const state = getState()
 
+    /*
     const hasUserChanged = state.app.user !== prevState.app.user
 
     if (!hasUserChanged) {
@@ -134,6 +148,7 @@ export default ({ getState, dispatch }) => {
       BackgroundGeolocation.stop()
       BackgroundGeolocationEvents.forEach(event => BackgroundGeolocation.removeAllListeners(event))
     }
+    */
 
     return result
   }
